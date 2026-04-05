@@ -50,14 +50,14 @@ def predict():
             - households
             - median_income
           properties:
-            longitude: {type: number, example: -114.31}
-            latitude: {type: number, example: 34.19}
-            housing_median_age: {type: number, example: 15.0}
-            total_rooms: {type: number, example: 5612.0}
-            total_bedrooms: {type: number, example: 1283.0}
-            population: {type: number, example: 1015.0}
-            households: {type: number, example: 472.0}
-            median_income: {type: number, example: 1.4936}
+            longitude: {type: number, example: -122.23}
+            latitude: {type: number, example: 37.88}
+            housing_median_age: {type: number, example: 41.0}
+            total_rooms: {type: number, example: 880.0}
+            total_bedrooms: {type: number, example: 129.0}
+            population: {type: number, example: 322.0}
+            households: {type: number, example: 126.0}
+            median_income: {type: number, example: 8.3252}
     responses:
       200:
         description: Predicted price
@@ -77,6 +77,14 @@ def predict():
         # Feature engineering (IMPORTANT: same as training)
         df['bedroom_ratio'] = df['total_bedrooms'] / df['total_rooms']
         df['household_rooms'] = df['total_rooms'] / df['households']
+
+        # Enforce exact column order required by the model
+        expected_cols = [
+            "longitude", "latitude", "housing_median_age", "total_rooms",
+            "total_bedrooms", "population", "households", "median_income",
+            "bedroom_ratio", "household_rooms"
+        ]
+        df = df[expected_cols]
 
         prediction = model.predict(df)[0]
 
