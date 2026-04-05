@@ -1,26 +1,30 @@
-# train.py
-
 import pandas as pd
-from sklearn.ensemble import RandomForestRegressor
 import pickle
+from sklearn.ensemble import RandomForestRegressor
+import os
 
-# Load dataset (keep CSV locally in project folder)
-train_data = pd.read_csv("california_housing_train.csv")
+def train_model():
+    print("Loading data...")
+    df = pd.read_csv("california_housing_train.csv")
+    
+    # Feature engineering (must match prediction exactly)
+    df['bedroom_ratio'] = df['total_bedrooms'] / df['total_rooms']
+    df['household_rooms'] = df['total_rooms'] / df['households']
+    
+    # Handle any missing values just in case
+    df = df.fillna(0)
+    
+    X = df.drop("median_house_value", axis=1)
+    y = df["median_house_value"]
+    
+    print("Training model...")
+    model = RandomForestRegressor(n_estimators=100, random_state=42)
+    model.fit(X, y)
+    
+    print("Saving model to model.pkl...")
+    with open("model.pkl", "wb") as f:
+        pickle.dump(model, f)
+    print("Model saved successfully!")
 
-# Feature engineering
-train_data['bedroom_ratio'] = train_data['total_bedrooms'] / train_data['total_rooms']
-train_data['household_rooms'] = train_data['total_rooms'] / train_data['households']
-
-# Split features and target
-X = train_data.drop(['median_house_value'], axis=1)
-y = train_data['median_house_value']
-
-# Train model
-model = RandomForestRegressor()
-model.fit(X, y)
-
-# Save model
-with open("model.pkl", "wb") as f:
-    pickle.dump(model, f)
-
-print("Model trained & saved ✅")
+if __name__ == "__main__":
+    train_model()
